@@ -15,6 +15,11 @@ export const marathonSchema = z
     email: z.email(),
     haveCoupon: z.boolean().default(false),
     couponCode: z.string().optional(),
+    password: z
+      .string()
+      .min(6, "Password must contain at least 6 characters")
+      .max(12, "Password must not exceed 12 characters"),
+    confirmPassword: z.string(),
   })
   .refine(
     (data) => {
@@ -24,6 +29,15 @@ export const marathonSchema = z
     {
       message: "Invalid coupon code",
       path: ["couponCode"],
+    }
+    )
+  .refine(
+    (data) => {
+      return data.confirmPassword.trim() === data.password.trim();
+    },
+    {
+      message: "Passwords does not match",
+      path: ["confirmPassword"],
     }
   );
 export type MarathonForm = z.infer<typeof marathonSchema>;
